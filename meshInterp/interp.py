@@ -40,11 +40,6 @@ class field:
             # load node array
             self.nodes = np.loadtxt(self.infiles[0],
                                     usecols = [0, 1, 2, 3],
-                                    converters = {0: np.int64,
-                                                  1: np.float64,
-                                                  2: np.float64,
-                                                  3: np.float64,
-                                                  },
                                     skiprows = 1,
                                     delimiter = ',',
                                     )
@@ -52,10 +47,7 @@ class field:
             # assumes one (scalar) value per node for now
             self.vals = np.loadtxt(self.infiles[1],
                                    usecols = [0, 1],
-                                   converters = {0: np.int64,
-                                                 1: np.float64,
-                                                 },
-                                    skiprows = 1,
+                                   skiprows = 1,
                                    delimiter = ',',
                                    )
 

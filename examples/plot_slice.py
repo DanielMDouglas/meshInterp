@@ -33,7 +33,7 @@ for i, x_i in enumerate(xSpace):
         fieldValues[i, j] = B_field(queryPoint)
 
 fig = plt.figure()
-plt.imshow(np.where(fieldValues > -1.e1, fieldValues, 0))
+plt.imshow(fieldValues)
 
 plt.colorbar()
 

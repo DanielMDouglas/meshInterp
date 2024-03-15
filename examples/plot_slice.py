@@ -18,10 +18,10 @@ print (B_field([[0, 0, 0],
                 [0, 0, 1]]))
 
 # let's make a grid of points to query and plot the resulting surface
-NpointsX = 100
-xSpace = np.linspace(-2, 0, NpointsX)
+NpointsX = 200
+xSpace = np.linspace(-3, -1, NpointsX)
 
-NpointsY = 100
+NpointsY = 200
 ySpace = np.linspace(0, 2, NpointsY)
 
 z = 0

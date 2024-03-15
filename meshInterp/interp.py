@@ -88,10 +88,8 @@ class field:
                 try:
                     bary_result = barycentric_interp(simplexNodes, simplexVals, queryPoint)
 
-                    # if the matrix inversion fails, just take the max or min neighbor value
-                    if bary_result > np.max(simplexVals):
-                        return inv_dist_interp(simplexNodes, simplexVals, queryPoint)
-                    elif bary_result < np.min(simplexVals):
+                    # if the matrix inversion fails, just use the inverse distance interpolation
+                    if bary_result > np.max(simplexVals) or bary_result < np.min(simplexVals):
                         return inv_dist_interp(simplexNodes, simplexVals, queryPoint)
 
                     return bary_result

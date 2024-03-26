@@ -18,8 +18,8 @@ print (B_field([[0, 0, 0],
                 [0, 0, 1]]))
 
 # let's make a grid of points to query and plot the resulting surface
-NpointsX, NpointsY = 400, 800 # this is quite high resolution, lower values might be better
-# NpointsX, NpointsY = 100, 200 # more manageable for testing
+# NpointsX, NpointsY = 400, 800 # this is quite high resolution, lower values might be better
+NpointsX, NpointsY = 100, 200 # more manageable for testing
 xSpace = np.linspace(-8.5, 0, NpointsX)
 
 ySpace = np.linspace(-5, 12, NpointsY)
@@ -33,10 +33,12 @@ for i, x_i in enumerate(xSpace):
         fieldValues[i, j] = B_field(queryPoint)
 
 fig = plt.figure()
-plt.imshow(fieldValues,
-           vmin = 0,
-           vmax = 0.005,
-           cmap = 'jet')
+plt.pcolormesh(xSpace, ySpace, fieldValues.T,
+               vmin = 0,
+               vmax = 0.005,
+               cmap = 'jet')
+plt.xlabel(r'x (Horizontal Direction)')
+plt.ylabel(r'y (Beam Direction)')
 
 plt.colorbar()
 

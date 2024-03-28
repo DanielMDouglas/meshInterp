@@ -1,15 +1,13 @@
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-from meshInterp import field
-
 from tqdm import tqdm
+
+from meshInterp import Field
 
 nodeFile = 'nodes.csv'
 valFile = 'B_field.csv'
 
-B_field = field(nodeFile, valFile)
+B_field = Field(nodeFile, valFile)
 
 # you can interpolate a field by passing in an (n x m) array
 # where n is the number of points in the query

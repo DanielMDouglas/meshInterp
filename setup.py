@@ -7,6 +7,7 @@ VER = "0.0.1"
 reqs = ["numpy",
         "scipy",
         "matplotlib",
+        "tqdm",
         ]
 
 setuptools.setup(

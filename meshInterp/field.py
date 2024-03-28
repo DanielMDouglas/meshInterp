@@ -18,17 +18,7 @@ class field:
             # sort by the node index to make sure
             # the nodes are aligned with the values 
             self.nodes = self.nodes[self.nodes[:,0].argsort()]
-            print ("nodes", self.nodes.shape)
-            print ("ext",
-                   np.min(self.nodes[:,0]),
-                   np.max(self.nodes[:,0]),
-                   np.min(self.nodes[:,1]),
-                   np.max(self.nodes[:,1]),
-                   np.min(self.nodes[:,2]),
-                   np.max(self.nodes[:,2]),
-                   np.min(self.nodes[:,3]),
-                   np.max(self.nodes[:,3]),
-                   )
+
             # load value array
             # assumes one (scalar) value per node for now
             self.vals = np.loadtxt(self.infiles[1],

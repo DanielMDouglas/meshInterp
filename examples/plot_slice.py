@@ -21,23 +21,21 @@ print ("field value at point", pointB, B_field(pointB))
 print ("evaluating at both points with a single array", B_field(np.concatenate([pointA, pointB])))
 
 # let's make a grid of points to query and plot the resulting surface
-# NpointsX, NpointsY = 400, 800 # this is quite high resolution, lower values might be better
-NpointsX, NpointsY = 100, 200 # more manageable for testing
+NpointsX, NpointsY = 400, 800 # this is quite high resolution, lower values might be better
+# NpointsX, NpointsY = 100, 200 # more manageable for testing
 xSpace = np.linspace(-8.5, 0, NpointsX)
 
 ySpace = np.linspace(-5, 12, NpointsY)
 
-z = 0
+zSpace = np.array([0])
 
-fieldValues = np.empty((NpointsX, NpointsY))
-print ("scanning a grid to generate a field map for the slice z =", z)
-for i, x_i in tqdm(enumerate(xSpace), total = NpointsX):
-    for j, y_j in enumerate(ySpace):
-        queryPoint = [[x_i, y_j, z]]
-        fieldValues[i, j] = B_field(queryPoint)
+domain = np.array(np.meshgrid(xSpace, ySpace, zSpace)).reshape(3, NpointsX*NpointsY).T
+
+print ("scanning a grid to generate a field map for the slice z = 0")
+fieldValues = B_field(domain).reshape(NpointsY, NpointsX)
 
 fig = plt.figure()
-plt.pcolormesh(xSpace, ySpace, fieldValues.T,
+plt.pcolormesh(xSpace, ySpace, fieldValues,
                vmin = 0,
                vmax = 0.005,
                cmap = 'jet')

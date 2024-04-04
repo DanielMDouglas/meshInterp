@@ -48,64 +48,48 @@ class Field:
             # this should be true because we sorted the input arrays
             assert np.all(self.nodes[:,0] == self.vals[:,0])
 
+            # now that the arrays are aligned, let's ditch the index
+            self.nodes = self.nodes[:,1:]
+            self.vals = self.vals[:,1:]
+
+            self.field_dim = self.vals.shape[1]
+            
             # build a KD tree for rough node finding
-            self.kdtree = KDTree(self.nodes[:,1:])
+            self.kdtree = KDTree(self.nodes)
 
-            def interp_field(query_point, n_local_neighbors = 10):
+            def interp_field(query_array, n_local_neighbors = 8):
+                try:
+                    assert type(query_array) == np.ndarray
+                except AssertionError:
+                    query_array = np.array(query_array)
+                
+                n_query_points = query_array.shape[0]
+
+                result = np.empty((self.field_dim,
+                                   n_query_points))
+                
                 # get a somewhat large number of neighbors
-                query = self.kdtree.query(query_point, n_local_neighbors)
+                neighbor_query = self.kdtree.query(query_array, n_local_neighbors)
+
                 # get the position and fields for these neighbors
-                neighbor_points = self.nodes[query[1]][0]
-                neighbor_vals = self.vals[query[1]][0]
+                neighbor_points = np.swapaxes(self.nodes[neighbor_query[1][:]], 0, 1)
+                neighbor_vals = np.swapaxes(self.vals[neighbor_query[1][:]], 0, -1)
+                
+                # a simple inverse-distance weighting interpolation
+                # this is very simple to write in a parallel way
+                # as opposed to a more sophisticated barycentric interpolation
+                d = np.sqrt(np.sum(np.power(query_array - neighbor_points, 2), axis = -1))
+                w = np.power(d, -1)
 
-                # find the delaunay graph in this neighborhood
-                # this is to enforce interpolation from nodes which
-                # "enclose" the query point
-                try:
-                    tess = Delaunay(neighbor_points[:,1:])
+                interp_val = np.sum(w*neighbor_vals, axis = 1)/np.sum(w, axis = 0)
 
-                except QhullError:
-                    return self.out_of_bounds_value
-
-                simpl_index = tess.find_simplex(query_point)
-                node_indices = tess.simplices[simpl_index]
-
-                # the 4 mesh nodes which form a simplex around the query
-                simplex_nodes = neighbor_points[node_indices][0,:,1:]
-                simplex_vals = neighbor_vals[node_indices][0,:,1:]
-
-                try:
-                    bary_result = interp.barycentric_interp(simplex_nodes,
-                                                            simplex_vals,
-                                                            query_point)
-
-                    # if the matrix inversion fails, just use the inverse distance interpolation
-                    if bary_result > np.max(simplex_vals) or bary_result < np.min(simplex_vals):
-                        return interp.inv_dist_interp(simplex_nodes,
-                                                      simplex_vals,
-                                                      query_point)
-
-                    return bary_result
-
-                except np.linalg.LinAlgError: # is the matrix singular?
-                    return interp.inv_dist_interp(simplex_nodes, simplex_vals, query_point)
-
+                return interp_val
+                
             self.interp_field = interp_field
 
     def __call__(self, query_point, **kwargs):
-        # input must be an array of shape (n x m)
-        # or (1 x m).  If n > 1, just interpolate serially
-        qp = np.array(query_point)
-        assert len(qp.shape) == 2 and qp.shape[1] == 3
-
-        if qp.shape[0] > 1:
-            result = []
-            for this_query in qp:
-                result.append(self.interp_field([this_query], **kwargs))
-
-            return np.array(result)
-
-        return self.interp_field(qp)
+        
+        return self.interp_field(query_point)
 
     def get_nodes(self):
         """

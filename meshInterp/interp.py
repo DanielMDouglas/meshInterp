@@ -1,5 +1,18 @@
 import numpy as np
 
+def is_within_range(ref_vals, interp_val):
+    """
+    Sanity check function to ensure that the interpolated
+    value lies somewhere within the range spanned by the
+    input values
+    """
+
+    if interp_val > np.max(ref_vals):
+        return False
+    if interp_val < np.min(ref_vals):
+        return False
+    return True
+
 def barycentric_interp(node_pos, node_val, qp):
     """
     Returns the interpolated value of a field at point qp
@@ -7,8 +20,8 @@ def barycentric_interp(node_pos, node_val, qp):
     """
 
     # get the barycentric coordinates of the query point
-    rot = np.matrix([np.concatenate([[1], nodeLoc]) for nodeLoc in node_pos]).T
-    interp_vec = np.concatenate([[[1]], qp], axis = 1).flatten()
+    rot = np.matrix(np.concatenate([np.ones((4, 1)), node_pos], axis = -1)).T
+    interp_vec = np.concatenate([[1], qp]).flatten()
 
     bary_coords = np.array(np.dot(rot.I, interp_vec)).flatten()
 
